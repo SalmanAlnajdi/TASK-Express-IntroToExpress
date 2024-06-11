@@ -1,24 +1,63 @@
+const Product = require("../../models/Product.js");
 
-const products = require('../../data.js');
-
-const getAllProducts = (req, res) => {
-    return   res.json(products);
- }
-
- const getOneProduct = (req, res) => {
-    const product = products.find(p => p.id == req.params.id);
-    return res.json(product);
-}
-
-const createProduct = (req, res) => {
-    products.push(req.body);
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find();
     return res.json(products);
-}
+  } catch (error) {
+    return res.json(error);
+  }
+};
 
-const deleteProduct = (req, res) => {
-    const product = products.find(p => p.id == req.params.id);
-    products.splice(products.indexOf(product), 1);
-    return res.json(products);
-}
+const getOneProduct = async (req, res) => {
+  const id = req.params.id;
 
-module.exports = {getAllProducts, getOneProduct, createProduct, deleteProduct};
+  try {
+    const product = await Product.findById(id);
+    if (product) {
+      return res.status(200).json(product);
+    } else {
+      return res.status(404).first.json({ meg: "product not found!!" });
+    }
+  } catch (error) {
+    return res.status(error.status || 500).json(error);
+  }
+};
+
+const createProduct = async (req, res) => {
+  try {
+    const newProduct = await Product.create(req.body);
+    return res.status(201).json(newProduct);
+  } catch (error) {
+    return res.status(error.status || 500).json(error);
+  }
+};
+
+const updateProduct = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(id, req.body);
+    return res.status(202).json(updatedProduct);
+  } catch (error) {
+    return res.status(error.status || 500).json(error);
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    await Product.findByIdAndDelete(id);
+  } catch (error) {
+    return res.status(error.status || 500).json(error);
+  }
+};
+
+module.exports = {
+  getAllProducts,
+  getOneProduct,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
