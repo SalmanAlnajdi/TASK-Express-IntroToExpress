@@ -1,11 +1,11 @@
 const Product = require("../../models/Product.js");
 
-const getAllProducts = async (req, res) => {
+const getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
     return res.json(products);
   } catch (error) {
-    return res.json(error);
+    return next(error);
   }
 };
 
